@@ -10,14 +10,24 @@ variable "bucket_name" {
   default = "books-bucket"
 }
 
-variable "source_url" {
-    default = "https://raw.githubusercontent.com/paulbaumgarten/data-sets/master/books.csv"
-}
 
-variable "object_name" {
-  default = "books-collection.csv"
-}
+variable "documents" {
+  description = "Map of documents to download and create as objects."
+  type        = map(any)
+  default = {
+    books = {
+      source_url = "https://raw.githubusercontent.com/paulbaumgarten/data-sets/master/books.csv",
+      object_name= "books-collection.csv",
+      content_type="text/csv",
+      content=""
+    
+    },
+    fruit = {      
+      content= "apples,oranges,bananas,pears"
+      object_name= "fruitbasket.txt",
+      content_type="text/plain",
+      source_url=""
 
-variable "content_type" {
-  default = "text/csv"
+    }
+  }
 }

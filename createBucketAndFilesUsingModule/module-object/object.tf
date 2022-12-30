@@ -2,6 +2,8 @@ variable "the_bucket_name" {
 }
 variable "object_name" {
 }
+variable "source_url" {
+}
 variable "content" {
 }
 variable "namespace" {
@@ -14,9 +16,14 @@ resource "oci_objectstorage_object" "the_object_in_bucket" {
      bucket = var.the_bucket_name
      object = var.object_name
      namespace = var.namespace
-     content = var.content
+     content = var.source_url!="" ? data.http.downloaded_document[0].response_body : var.content 
      content_type = var.content_type
  }
+
+data "http" "downloaded_document" {
+  count = (var.source_url!="" ? 1 : 0)
+  url = var.source_url
+}
 
 output "new-object" {
   value = oci_objectstorage_object.the_object_in_bucket
