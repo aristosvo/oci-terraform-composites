@@ -1,22 +1,18 @@
-variable "the_bucket_name" {
-}
-variable "object_name" {
-}
-variable "source_url" {
-}
-variable "content" {
-}
-variable "namespace" {
-}
-variable "content_type" {
-}
+variable "the_bucket_name" {}
+variable "object_name" {}
+variable "source_url" {}
+variable "source_file" {}
+variable "content" {}
+variable "namespace" {}
+variable "content_type" {}
 
 # the object to be managed in a bucket
 resource "oci_objectstorage_object" "the_object_in_bucket" {
      bucket = var.the_bucket_name
      object = var.object_name
      namespace = var.namespace
-     content = var.source_url!="" ? data.http.downloaded_document[0].response_body : var.content 
+     content = (var.source_file == "" ? (var.source_url !=""? data.http.downloaded_document[0].response_body : var.content):null) 
+     source = (var.source_file != "" ? var.source_file : null)
      content_type = var.content_type
  }
 
