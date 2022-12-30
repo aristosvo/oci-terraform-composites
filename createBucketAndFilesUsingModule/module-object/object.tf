@@ -35,3 +35,5 @@ data "oci_objectstorage_object" "read_the_object" {
 output "show-the-object-content-length" {
   value = data.oci_objectstorage_object.read_the_object.content_length
 }
+
+

@@ -10,6 +10,7 @@ variable "bucket_name" {
   default = "books-bucket"
 }
 
+variable "source_directory" {}
 
 variable "documents" {
   description = "Map of documents to download and create as objects."

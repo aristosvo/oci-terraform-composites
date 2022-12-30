@@ -19,13 +19,13 @@ module "object-in-bucket" {
 }
 
 module "objects-in-bucket-from-files" {    
-    for_each =  fileset(path.module, "files/*")
+    for_each =  fileset(var.source_directory, "**")
     source        = "./module-object"
     object_name = each.key # remove everything before and including the last / character
     the_bucket_name = oci_objectstorage_bucket.the_bucket.name # the reference to the bucket object ensures that Terraform is aware of the dependency between this module and the bucket  
     source_url = ""
     content = ""
-    source_file =  each.key
+    source_file =  "${var.source_directory}/${each.key}"
     namespace = data.oci_objectstorage_namespace.os_namespace.namespace
     content_type = ""
 }
