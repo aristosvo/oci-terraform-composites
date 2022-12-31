@@ -8,3 +8,10 @@ The assumptions/prerequisites:
 
 To run/apply the plan: see [Article on Medium - Getting started quickly with querying OCI from Terraform in Cloud Shell](https://medium.com/oracledevs/getting-started-quickly-with-querying-oci-from-terraform-in-cloud-shell-40f0e8bb44cc)
 
+terraform init
+
+terraform plan
+
+terraform apply
+
+terraform apply -var bucket_name='extra_special_bucket' -var object_name='sample_text.txt' -var source_url='https://filesamples.com/samples/document/txt/sample3.txt' -var content_type='text/plain'
