@@ -10,8 +10,50 @@ File resources.tf defines four output-resources that print the respective values
 
 Run this Terraform configuration using:
 
+```
 terraform init
 terraform apply
 terraform apply -var environment=prod
+```
 
+The file from which the map is created does  not have to be a local file, it can also be a document available at some accessible URL. For example: https://raw.githubusercontent.com/lucasjellema/oci-terraform-composites/main/lookup_%20variables_in_json/prod-env-variables.json
 
+By adding the local 
+
+```
+source_url = "https://raw.githubusercontent.com/lucasjellema/oci-terraform-composites/main/lookup_%20variables_in_json/${var.environment}-env-variables.json"
+```
+to the variables.tf file and changing the definition of the json_string
+
+```
+ # json_string = file(local.filename)
+ json_string = data.http.downloaded_document.response_body
+ 
+ And leveraging the data source
+ data "http" "downloaded_document" {
+  url = local.source_url
+}
+```
+
+We can have the Terraform configuration dynamically influenced by a document somewhere on GitHub. Update the JSON document and reapply the Terraform configuration to have configuration values take effect.
+
+A little more elegantly:
+```
+locals {
+ filename = "${var.environment}-env-variables.json"
+ source_url = "https://raw.githubusercontent.com/lucasjellema/oci-terraform-composites/main/lookup_%20variables_in_json/${var.environment}-env-variables.json"
+ json_string = var.configuration_origin == "local" ? file(local.filename) : data.http.downloaded_document.response_body
+ environmentsettings = jsondecode(local.json_string)
+```
+
+Now to apply the plan:
+
+```
+terraform apply -var environment=prod -var configuration_origin=local
+```
+
+or
+
+```
+terraform apply -var environment=dev -var configuration_origin=remote
+```
