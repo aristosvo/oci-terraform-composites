@@ -1,0 +1,4 @@
+{ "apiAEndpoint": "prodEndpointForAPIA",
+    "apiBEndpoint": "prodEndpointForAPIB",
+    "scaleFactor": 5
+  }
