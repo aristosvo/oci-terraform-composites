@@ -1,6 +1,6 @@
 # the bucket to be managed by Terraform
 resource "oci_objectstorage_bucket" "the_bucket" {
-    compartment_id = var.compartment_id
+    compartment_id = var.compartment_ocid
     name           = var.bucket_name
     namespace      = data.oci_objectstorage_namespace.os_namespace.namespace
 }
@@ -13,20 +13,49 @@ data "oci_objectstorage_namespace" "os_namespace" {
 # use the module module-object to create the indicated object in the specified bucket 
 module "object1-in-bucket" {    
     source        = "./module-object"
-    object_name = filename1
+    object_name = local.filename1
     the_bucket_name = oci_objectstorage_bucket.the_bucket.name # the reference to the bucket object ensures that Terraform is aware of the dependency between this module and the bucket  
-    content = settings1
+    content = local.settings1
     namespace = data.oci_objectstorage_namespace.os_namespace.namespace
     content_type = "application/json"
+    source_url=""
+    source_file=""
 }
 
 # use the module module-object to create the indicated object in the specified bucket 
 module "object2-in-bucket" {    
     source        = "./module-object"
-    object_name = filename2
+    object_name = local.filename2
     the_bucket_name = oci_objectstorage_bucket.the_bucket.name # the reference to the bucket object ensures that Terraform is aware of the dependency between this module and the bucket  
-    content = settings2
+    content = local.settings2
     namespace = data.oci_objectstorage_namespace.os_namespace.namespace
     content_type = "application/json"
+    source_url=""
+    source_file=""
 }
 
+resource "oci_vault_secret" "sensitive_config_secret" {
+    #Required
+    compartment_id = var.compartment_ocid
+    key_id = var.master_key_ocid
+    secret_content {
+        #Required
+        content_type = "BASE64"
+
+        #Optional
+        content = base64encode(local.sensitivesettings)
+        name = var.secret_name
+    }
+    secret_name =  var.secret_name
+    vault_id = var.vault_ocid
+}
+
+
+data "oci_secrets_secretbundle" "sensitive_config_secretbundle" {
+	#Required
+	secret_id = oci_vault_secret.sensitive_config_secret.id
+}
+
+output "secret_revealed" {
+    value = base64decode(data.oci_secrets_secretbundle.sensitive_config_secretbundle.secret_bundle_content.0.content)
+}
