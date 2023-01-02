@@ -1,18 +1,28 @@
+variable "tenancy_ocid" { default = "ocid1.tenancy.oc1..aaaaaaaag7c7slwmlvsodyym662ixlsonnihko2igwpjwwe2egmlf3gg6okq" }
+
+variable "compartment_ocid" { default = "ocid1.compartment.oc1..aaaaaaaa5q2srleka3ll2xgpcdj3uns3nshzc3lbn2wgx2kcuah5blh47icq" }
+variable "bucket_name" { default = "configuration-bucket" }
+variable "secret_ocid" { default = "ocid1.vaultsecret.oc1.iad.amaaaaaa6sde7caamjpmqdteq6kilw3h52beoe7g5s7f7hdbks7iacmzlnha" }
+
 variable "environment" {
-    default = "dev"
+    default = "prod"
 }
 
-variable "configuration_origin" {
-    default = "local" # determine where to get the configuration setings from: local (file) or remote (URL)
-}
 
 locals {
- filename = "${var.environment}-env-variables.json"
- source_url = "https://raw.githubusercontent.com/lucasjellema/oci-terraform-composites/main/lookup_%20variables_in_json/${var.environment}-env-variables.json"
- json_string = var.configuration_origin == "local" ? file(local.filename) : data.http.downloaded_document.response_body
- environmentsettings = jsondecode(local.json_string)
+  filename1 = "dev-env-variables.json"
+  filename2 = "prod-env-variables.json"
+
+  sensitive_json_string = base64decode(data.oci_secrets_secretbundle.sensitive_config_secretbundle.secret_bundle_content.0.content)
+  sensitive_settings = jsondecode(local.sensitive_json_string)
  
- api_a_endpoint = lookup(local.environmentsettings, "apiAEndpoint")
- api_b_endpoint = lookup(local.environmentsettings, "apiBEndpoint")
- scaleFactor = lookup(local.environmentsettings, "scaleFactor")
+  # dev or prod TODO: replace first "dev with variable"
+  environment_json_string = var.environment == "dev" ? data.oci_objectstorage_object.read_the_object1.content : data.oci_objectstorage_object.read_the_object2.content 
+  environment_settings = jsondecode(local.environment_json_string)
+
+  settings = merge(local.sensitive_settings, local.environment_settings)
+
+ api_a_endpoint = lookup(local.settings, "apiAEndpoint")
+ apiASecureToken = lookup(local.settings, "apiASecureToken")
+ 
 }
