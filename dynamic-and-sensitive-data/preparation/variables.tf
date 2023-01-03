@@ -14,7 +14,7 @@ locals {
  filename1 = "dev-env-variables.json"
  filename2 = "prod-env-variables.json"
  sensitivefilename = "sensitive-variables.json"
- settings1 =  file(concat("files/",local.filename1)) 
- settings2 =  file(concat("files/",local.filename2)) 
- sensitivesettings =  file(concat("files/",local.sensitivefilename)) 
+ settings1 =  file("files/${local.filename1}") 
+ settings2 =  file("files/${local.filename2}") 
+ sensitivesettings =  file("files/${local.sensitivefilename}") 
 }
