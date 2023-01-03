@@ -1,5 +1,5 @@
 output "environment" {
-  value =  var.environment
+  value = var.environment
 }
 
 output "API-A-Endpoint" {

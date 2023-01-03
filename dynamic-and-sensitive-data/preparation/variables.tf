@@ -11,10 +11,10 @@ variable "master_key_ocid" { default = "ocid1.key.oc1.iad.bbpptuh6aacuu.abuwcljr
 
 
 locals {
- filename1 = "dev-env-variables.json"
- filename2 = "prod-env-variables.json"
- sensitivefilename = "sensitive-variables.json"
- settings1 =  file("files/${local.filename1}") 
- settings2 =  file("files/${local.filename2}") 
- sensitivesettings =  file("files/${local.sensitivefilename}") 
+  filename1         = "dev-env-variables.json"
+  filename2         = "prod-env-variables.json"
+  sensitivefilename = "sensitive-variables.json"
+  settings1         = file("files/${local.filename1}")
+  settings2         = file("files/${local.filename2}")
+  sensitivesettings = file("files/${local.sensitivefilename}")
 }

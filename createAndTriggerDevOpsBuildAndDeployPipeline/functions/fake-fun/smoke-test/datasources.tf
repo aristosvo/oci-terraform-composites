@@ -14,8 +14,8 @@ data "oci_identity_tenancy" "oci_tenancy" {
 
 
 data "oci_devops_projects" "current_devops_projects" {
-    compartment_id = "ocid1.compartment.oc1..aaaaaaaacsssekayq4d34nl5h3eqs5e6ak3j5s4jhlws6oxf7rr5pxmt3zrq"
- }
+  compartment_id = "ocid1.compartment.oc1..aaaaaaaacsssekayq4d34nl5h3eqs5e6ak3j5s4jhlws6oxf7rr5pxmt3zrq"
+}
 
 
 locals {
@@ -23,6 +23,6 @@ locals {
 }
 
 output "devops_project_id" {
-  value = "${local.devops_projects}"
+  value = local.devops_projects
 }
 

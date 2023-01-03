@@ -1,14 +1,14 @@
 ### Repository in the Container Image Registry for the container images underpinning the function 
 resource "oci_artifacts_container_repository" "container_repository_for_function" {
-    # note: repository = store for all images versions of a specific container image - so it included the function name
-    compartment_id = var.compartment_ocid
-    display_name = "${local.ocir_repo_name}/${var.function_name}"
-    is_immutable = false
-    is_public = false
+  # note: repository = store for all images versions of a specific container image - so it included the function name
+  compartment_id = var.compartment_ocid
+  display_name   = "${local.ocir_repo_name}/${var.function_name}"
+  is_immutable   = false
+  is_public      = false
 }
 
 resource "null_resource" "Login2OCIR" {
-  depends_on = [ oci_artifacts_container_repository.container_repository_for_function]
+  depends_on = [oci_artifacts_container_repository.container_repository_for_function]
 
   provisioner "local-exec" {
     command = "echo '${var.ocir_user_password}' |  docker login ${local.ocir_docker_repository} --username ${local.ocir_namespace}/${var.ocir_user_name} --password-stdin"
@@ -53,8 +53,8 @@ resource "null_resource" "FnPush2OCIR" {
 
 resource "oci_functions_function" "new_function" {
   depends_on     = [null_resource.FnPush2OCIR]
-  application_id = "${local.application_id}"
-  display_name   = "${var.function_name}"
+  application_id = local.application_id
+  display_name   = var.function_name
   image          = "${local.ocir_docker_repository}/${local.ocir_namespace}/${local.ocir_repo_name}/${var.function_name}:0.0.1"
   memory_in_mbs  = "128"
   config = tomap({
@@ -68,20 +68,20 @@ resource "oci_functions_function" "new_function" {
 ## Error Message: Authorization failed or requested resource not found 
 ##│Suggestion: Either the resource has been deleted or service Functions Invoke Function need policy to access this resource. 
 resource "time_sleep" "wait_for_function_to_be_ready" {
-  depends_on = [oci_functions_function.new_function]
+  depends_on      = [oci_functions_function.new_function]
   create_duration = "10s"
 }
 
 resource "oci_functions_invoke_function" "test_invoke_new_function" {
-  depends_on     = [time_sleep.wait_for_function_to_be_ready]
-    #Required
-    function_id = oci_functions_function.new_function.id
+  depends_on = [time_sleep.wait_for_function_to_be_ready]
+  #Required
+  function_id = oci_functions_function.new_function.id
 
-    #Optional
-    invoke_function_body = var.test_invoke_function_body
-    fn_intent = "httprequest"
-    fn_invoke_type = "sync" 
-    base64_encode_content = false
+  #Optional
+  invoke_function_body  = var.test_invoke_function_body
+  fn_intent             = "httprequest"
+  fn_invoke_type        = "sync"
+  base64_encode_content = false
 }
 
 output "function_response" {

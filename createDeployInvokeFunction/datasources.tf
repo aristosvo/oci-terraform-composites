@@ -1,6 +1,6 @@
 data "oci_functions_applications" "function_applications" {
   compartment_id = var.compartment_ocid
-  display_name   = "${var.application_name}"
+  display_name   = var.application_name
 }
 
 locals {
