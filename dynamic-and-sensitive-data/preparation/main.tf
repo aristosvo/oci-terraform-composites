@@ -9,10 +9,9 @@ data "oci_objectstorage_namespace" "os_namespace" {
   compartment_id = var.tenancy_ocid
 }
 
-
 # use the module module-object to create the indicated object in the specified bucket 
 module "object1-in-bucket" {    
-    source        = "./module-object"
+    source        = "./modules/object-storage-object"
     object_name = local.filename1
     the_bucket_name = oci_objectstorage_bucket.the_bucket.name # the reference to the bucket object ensures that Terraform is aware of the dependency between this module and the bucket  
     content = local.settings1
@@ -24,7 +23,7 @@ module "object1-in-bucket" {
 
 # use the module module-object to create the indicated object in the specified bucket 
 module "object2-in-bucket" {    
-    source        = "./module-object"
+    source        = "./modules/object-storage-object"
     object_name = local.filename2
     the_bucket_name = oci_objectstorage_bucket.the_bucket.name # the reference to the bucket object ensures that Terraform is aware of the dependency between this module and the bucket  
     content = local.settings2
@@ -39,10 +38,7 @@ resource "oci_vault_secret" "sensitive_config_secret" {
     compartment_id = var.compartment_ocid
     key_id = var.master_key_ocid
     secret_content {
-        #Required
         content_type = "BASE64"
-
-        #Optional
         content = base64encode(local.sensitivesettings)
         name = var.secret_name
     }
@@ -50,12 +46,8 @@ resource "oci_vault_secret" "sensitive_config_secret" {
     vault_id = var.vault_ocid
 }
 
-
 data "oci_secrets_secretbundle" "sensitive_config_secretbundle" {
 	#Required
 	secret_id = oci_vault_secret.sensitive_config_secret.id
 }
 
-output "secret_revealed" {
-    value = base64decode(data.oci_secrets_secretbundle.sensitive_config_secretbundle.secret_bundle_content.0.content)
-}
